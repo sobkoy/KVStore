@@ -1,7 +1,4 @@
-#pragma once
 #include <iostream>
-
-#include "free_list_pool_allocator.h"
 
 
 // Pool part

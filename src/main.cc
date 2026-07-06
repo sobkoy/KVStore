@@ -16,8 +16,6 @@ int main() {
 
 
 
-
-
   /*
   FreeListPoolAllocator<char> allocator;
 
@@ -47,5 +45,54 @@ int main() {
   std::list<std::string, FreeListPoolAllocator<std::string>> lst{"mystr123"};
   std::cout << *lst.begin() << std::endl;
 
+
+
+  std::list<std::string, FreeListPoolAllocator<std::string>> lst2 = lst;
+  std::cout << *lst2.begin() << std::endl;
+
+
+  std::list<std::string, FreeListPoolAllocator<std::string>> lst3 = {"my_3_text"};
+  std::cout << *lst3.begin() << std::endl;
+
+  lst.erase(lst.begin());
+
+  //lst.erase(lst3.begin());
+
+
+  lst.insert(lst.begin(), lst3.begin(), lst3.end());
+
+  lst.push_back("last_string_to_lst1");
+
+  std::list<std::string, FreeListPoolAllocator<std::string>> lst4;
+
+  lst4 = std::move(lst);
+
+
+
+
+  std::cout << "---" << std::endl;
+  //std::cout << *lst.begin() << std::endl;
+  //std::cout << &*lst.begin() << std::endl;
+  //std::cout << *std::next(lst.begin()) << std::endl;
+  //std::cout << &*std::next(lst.begin()) << std::endl;
+  std::cout << *lst2.begin() << std::endl;
+  std::cout << &*lst2.begin() << std::endl;
+  std::cout << *lst3.begin() << std::endl;
+  std::cout << &*lst3.begin() << std::endl;
+  std::cout << *lst4.begin() << std::endl;
+  std::cout << &*lst4.begin() << std::endl;
+  std::cout << *std::next(lst4.begin()) << std::endl;
+  std::cout << &*std::next(lst4.begin()) << std::endl;
+  std::cout << "---" << std::endl;
+
+
+
+
   return 0;
+
+
+
+
+
+
 }
