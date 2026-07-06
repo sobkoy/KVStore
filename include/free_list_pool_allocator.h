@@ -1,7 +1,6 @@
 #pragma once
 #include <cstddef>
 #include <memory>
-#include <random>
 
 
 // Pool for Allocator
@@ -50,7 +49,8 @@ public:
   using propagate_on_container_copy_assignment = std::true_type;
   using propagate_on_container_move_assignment = std::true_type;
   using propagate_on_container_swap = std::true_type;
-  FreeListPoolAllocator() noexcept : memory_pool_(std::make_shared<MemoryPool<> >()) {}
+  FreeListPoolAllocator(std::size_t total_size_ = 1024 * 1024) noexcept
+    : memory_pool_(std::make_shared<MemoryPool<>>(total_size_)) {}
 
   [[nodiscard]] std::shared_ptr<MemoryPool<> > get_memory_pool() const noexcept {
     return memory_pool_;
