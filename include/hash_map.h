@@ -1,0 +1,87 @@
+#pragma once
+
+#include "entry.h"
+
+class HashMap {
+public:
+  HashMap(size_t size = 1000)
+    : buckets_count_(size),
+      buckets_(new Entry*[buckets_count_]{}) {}
+
+  HashMap(const HashMap&) = delete;
+
+  HashMap& operator=(const HashMap&) = delete;
+
+  ~HashMap() {
+    // remember to call from kv-store
+    delete [] buckets_;
+  }
+
+  Entry* FindEntry(std::string_view key) {
+    std::size_t index = HashFunction(key);
+    Entry* current = buckets_[index];
+    while (current != nullptr) {
+      if (std::string_view(current->key) == key) {
+        return current;
+      }
+      current = current->next;
+    }
+    return nullptr;
+  }
+
+  Entry* Erase(std::string_view key) { // returns where we need to dealloc mem
+    std::size_t index = HashFunction(key);
+    if (buckets_[index] = nullptr) {
+      return nullptr;
+    }
+
+    Entry* current = buckets_[index];
+    if (current->key == key) {
+      Entry* temp = current;
+      buckets_[index] = current->next;
+      return temp;
+    }
+
+    Entry* previous = current;
+    current = current->next;
+    while (current != nullptr) {
+      if (current->key == key) {
+        Entry* temp = current;
+        previous->next = current->next;
+        return temp;
+      }
+      previous = current;
+      current = current->next;
+
+    }
+
+    return nullptr;
+  }
+
+  //
+  //
+  // Next step is to implement Clear (Foreach), so start with KVStore itself
+  //
+  //
+
+  void Insert(Entry* entry) {
+    std::size_t index = HashFunction(entry->key);
+    if (buckets_[index] == nullptr) {
+      buckets_[index] = entry;
+    } else {
+      entry->next = buckets_[index];
+      buckets_[index] = entry;
+    }
+  }
+
+  template<typename Func>
+  void ForEach(Func&& func) {}
+
+private:
+  std::size_t buckets_count_;
+  Entry** buckets_;
+
+  std::size_t HashFunction(std::string_view key) {
+    return std::hash<std::string_view>{}(key) % buckets_count_;
+  }
+};

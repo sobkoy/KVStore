@@ -2,6 +2,8 @@
 #include <list>
 #include <chrono>
 #include <free_list_pool_allocator.h>
+#include "hash_map.h"
+
 
 
 int main() {
@@ -21,30 +23,35 @@ int main() {
   }*/
 
 
-  while (true) {
-    auto start = std::chrono::high_resolution_clock::now();
+  // while (true) {
+  //   auto start = std::chrono::high_resolution_clock::now();
+  //
+  //   {
+  //     std::list<std::string> list;
+  //     //FreeListPoolAllocator<std::string> allocator(100 * 1024 * 1024);
+  //     //std::list<std::string, FreeListPoolAllocator<std::string> > list(allocator);
+  //     for (std::size_t i{}; i < kN; ++i) {
+  //       list.push_back("A");
+  //     }
+  //
+  //     for (std::size_t i{}; i < kN / 2; ++i) {
+  //       list.pop_back();
+  //     }
+  //
+  //     for (std::size_t i{}; i < kN / 2; ++i) {
+  //       list.push_back("A");
+  //     }
+  //
+  //   }
+  //
+  //   auto end = std::chrono::high_resolution_clock::now();
+  //   double ms = std::chrono::duration<double, std::milli>(end - start).count();
+  //   std::cout << ms << " ms" << std::endl;
+  // }
 
-    {
-      std::list<std::string> list;
-      //FreeListPoolAllocator<std::string> allocator(100 * 1024 * 1024);
-      //std::list<std::string, FreeListPoolAllocator<std::string> > list(allocator);
-      for (std::size_t i{}; i < kN; ++i) {
-        list.push_back("A");
-      }
+  std::cout << sizeof(Entry) << std::endl;
 
-      for (std::size_t i{}; i < kN / 2; ++i) {
-        list.pop_back();
-      }
 
-      for (std::size_t i{}; i < kN / 2; ++i) {
-        list.push_back("A");
-      }
 
-    }
-
-    auto end = std::chrono::high_resolution_clock::now();
-    double ms = std::chrono::duration<double, std::milli>(end - start).count();
-    std::cout << ms << " ms" << std::endl;
-  }
   return 0;
 }
