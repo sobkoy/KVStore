@@ -2,7 +2,6 @@
 #include <list>
 #include <chrono>
 #include <free_list_pool_allocator.h>
-#include "hash_map.h"
 #include <key_value_store.h>
 
 
@@ -56,9 +55,20 @@ int main() {
   store.Put("keyString2", "qwerty1234");
   const char* info2 = store.Get("keyString2");
 
-  std::cout << info2[3] << std::endl;
   std::cout << info[0] << std::endl;
   std::cout << info2[3] << std::endl;
+
+  store.Erase("keyString2");
+  std::cout << info[0] << std::endl;
+  std::cout << info2[3] << std::endl;
+
+  store.Put("keyString3", "qwe");
+  const char* info3 = store.Get("keyString3");
+  std::cout << info3[1] << std::endl;
+
+  store.Clear();
+
+  std::cout << "adssadsadasdsad" << std::endl;
 
   return 0;
 }

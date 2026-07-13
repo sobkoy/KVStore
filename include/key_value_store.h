@@ -5,15 +5,6 @@
 
 class KeyValueStore {
 public:
-  Entry* CreateEntry(const std::string_view key, const std::string_view value) {
-    Entry* entry = allocator_.allocate(1);
-    new(entry) Entry(key, value);
-    return entry;
-  }
-
-  void DestryEntry(Entry* entry) {
-    allocator_.deallocate(entry, 1);
-  }
 
   bool Put(const std::string_view key, const std::string_view value) {
     if (key.size() >= Entry::kKeySize || value.size() >= Entry::kValueSize) {
@@ -54,6 +45,17 @@ public:
   }
 
 private:
+
+  Entry* CreateEntry(const std::string_view key, const std::string_view value) {
+    Entry* entry = allocator_.allocate(1);
+    new(entry) Entry(key, value);
+    return entry;
+  }
+
+  void DestryEntry(Entry* entry) {
+    allocator_.deallocate(entry, 1);
+  }
+
   HashMap hash_table_;
   FreeListPoolAllocator<Entry> allocator_;
 };
