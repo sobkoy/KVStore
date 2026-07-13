@@ -35,10 +35,11 @@ public:
   Entry* Erase(const std::string_view key) {
     // returns where we need to dealloc mem
     const std::size_t index = HashFunction(key);
+    // no element
     if (buckets_[index] == nullptr) {
       return nullptr;
     }
-
+    // 1 element
     Entry* current = buckets_[index];
     if (current->key == key) {
       Entry* temp = current;
@@ -46,6 +47,8 @@ public:
       return temp;
     }
 
+
+    // more than 1 element
     Entry* previous = current;
     current = current->next;
     while (current != nullptr) {
@@ -78,7 +81,17 @@ public:
   }
 
   template<typename Func>
-  void ForEach(Func&& func) {}
+  void Clear(Func&& Destroy) {
+    for (std::size_t index{}; index < buckets_count_; ++index) {
+      Entry* current = buckets_[index];
+      while (current != nullptr) {
+        Entry* next = current->next;
+        Destroy(current);
+        current = next;
+      }
+      buckets_[index] = nullptr;
+    }
+  }
 
 private:
   std::size_t buckets_count_;
