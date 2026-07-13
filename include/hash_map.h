@@ -1,10 +1,13 @@
 #pragma once
 
+#include <functional>
+#include <string_view>
+
 #include "entry.h"
 
 class HashMap {
 public:
-  HashMap(size_t size = 1000)
+  HashMap(const std::size_t size = 1000)
     : buckets_count_(size),
       buckets_(new Entry*[buckets_count_]{}) {}
 
@@ -17,8 +20,8 @@ public:
     delete [] buckets_;
   }
 
-  Entry* FindEntry(std::string_view key) {
-    std::size_t index = HashFunction(key);
+  Entry* FindEntry(const std::string_view key) {
+    const std::size_t index = HashFunction(key);
     Entry* current = buckets_[index];
     while (current != nullptr) {
       if (std::string_view(current->key) == key) {
@@ -29,9 +32,10 @@ public:
     return nullptr;
   }
 
-  Entry* Erase(std::string_view key) { // returns where we need to dealloc mem
-    std::size_t index = HashFunction(key);
-    if (buckets_[index] = nullptr) {
+  Entry* Erase(const std::string_view key) {
+    // returns where we need to dealloc mem
+    const std::size_t index = HashFunction(key);
+    if (buckets_[index] == nullptr) {
       return nullptr;
     }
 
@@ -52,7 +56,6 @@ public:
       }
       previous = current;
       current = current->next;
-
     }
 
     return nullptr;
@@ -81,7 +84,7 @@ private:
   std::size_t buckets_count_;
   Entry** buckets_;
 
-  std::size_t HashFunction(std::string_view key) {
+  [[nodiscard]] std::size_t HashFunction(const std::string_view key) const {
     return std::hash<std::string_view>{}(key) % buckets_count_;
   }
 };
