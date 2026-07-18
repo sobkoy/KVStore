@@ -23,3 +23,12 @@ target_include_directories(server
         PRIVATE
         ${PROJECT_SOURCE_DIR}/include/server
 )
+
+# Client part
+add_executable(client src/client/main.cc
+        src/client/client.cc)
+
+target_include_directories(client
+        PRIVATE
+        ${PROJECT_SOURCE_DIR}/include/client
+)

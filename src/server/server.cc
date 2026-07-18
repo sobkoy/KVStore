@@ -11,6 +11,11 @@
 void Server::Run() const {
   int server_socket_fd = socket(AF_INET, SOCK_STREAM, 0);
 
+  if (server_socket_fd == -1) {
+    std::cout << "ERROR: creating socket failed" << std::endl;
+    abort();
+  }
+
   in_addr str_to_net_addr_struct{};
   if (inet_pton(AF_INET, "0.0.0.0", &str_to_net_addr_struct) <= 0) {
     std::cerr << "ERROR: inet_pton failed" << std::endl;
@@ -69,7 +74,7 @@ void Server::Run() const {
         if (buffer[0] == 'y') { break; }
       }
       if (send(client_socket_fd, buffer, buffer_size, 0) == -1) {
-        std::cerr << "ERROR: send failed" << std::endl;
+        std::cerr << "ERROR: echo send failed" << std::endl;
       }
     }
     --counting_connections;
