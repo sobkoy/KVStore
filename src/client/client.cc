@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <string>
+#include <limits>
 
 Client::Client(std::string ip, unsigned short port) {
   client_socket_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -35,17 +36,30 @@ void Client::Connect() {
   while (true) {
     std::cout << "Enter your text: ";
     std::cin.getline(buffer, buffer_size);
+
+    if (std::cin.fail()) {
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      std::cout << "Your input was too long so only " << 128 << " characters was sent" << std::endl;
+      // check if break here is ok;
+    }
+
     std::size_t bytes_sent = send(client_socket_fd, buffer, buffer_size, 0);
     if (bytes_sent == -1) {
       std::cerr << "ERROR: sending data failed" << std::endl;
       continue;
     }
-
-    if (recv(client_socket_fd, buffer, buffer_size, 0) == -1) {
+    std::cout << "fucktest" << std::endl;
+    int bytes_received = recv(client_socket_fd, buffer, buffer_size, 0);
+    std::cout << "fucktest" << std::endl;
+    if (bytes_received == -1) {
       std::cerr << "ERROR: receiving echoed data failed" << std::endl;
       continue;
     }
-    std::cout << buffer << std::endl;
+    std::cout << bytes_received << " " << buffer << std::endl;
+    if (bytes_received == 0) { break;}
   }
+
+  close(client_socket_fd);
 
 }

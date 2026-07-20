@@ -35,15 +35,13 @@ void Server::Run() const {
 
   if (listen(server_socket_fd, 3) == -1) {
     std::cerr << "ERROR: listen failed" << std::endl;
-  } else {
-    std::cout << "Listening..." << std::endl;
   }
   int counting_connections = 3;
   while (counting_connections) {
     sockaddr_in client_info{};
     socklen_t client_info_len = sizeof(client_info);
+    std::cout << "Wait for client...\n" << std::endl;
     int client_socket_fd = accept(server_socket_fd, reinterpret_cast<sockaddr*>(&client_info), &client_info_len);
-    std::cout << "wait for client...\n" << std::endl;
     if (client_socket_fd == -1) {
       std::cerr << "ERROR: accept client failed" << std::endl;
       continue;
@@ -52,7 +50,7 @@ void Server::Run() const {
     char buffer[128]{};
     std::size_t buffer_size = sizeof(buffer);
     while (true) {
-      std::size_t bytes_read = recv(client_socket_fd, buffer, buffer_size, 0);
+      ssize_t bytes_read = recv(client_socket_fd, buffer, buffer_size, 0);
       if (bytes_read == -1) {
         std::cerr << "ERROR: recv failed" << std::endl;
         continue;
