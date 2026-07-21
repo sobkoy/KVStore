@@ -42,6 +42,7 @@ void Client::Connect() {
       std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
       std::cout << "Your input was too long so only " << 128 << " characters was sent" << std::endl;
       // check if break here is ok;
+      break;
     }
 
     std::size_t bytes_sent = send(client_socket_fd, buffer, buffer_size, 0);
@@ -49,14 +50,14 @@ void Client::Connect() {
       std::cerr << "ERROR: sending data failed" << std::endl;
       continue;
     }
-    std::cout << "fucktest" << std::endl;
+
     int bytes_received = recv(client_socket_fd, buffer, buffer_size, 0);
-    std::cout << "fucktest" << std::endl;
+
     if (bytes_received == -1) {
       std::cerr << "ERROR: receiving echoed data failed" << std::endl;
       continue;
     }
-    std::cout << bytes_received << " " << buffer << std::endl;
+    std::cout  << buffer << std::endl;
     if (bytes_received == 0) { break;}
   }
 
