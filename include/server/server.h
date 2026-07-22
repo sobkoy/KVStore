@@ -7,5 +7,6 @@ public:
   void Run() const;
 
 private:
+
   unsigned short port_;
 };
