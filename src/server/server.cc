@@ -56,7 +56,32 @@ void SetNonblocking(int fd) {
 }
 
 void HandleEvents(epoll_event* events, int nfds) {
+  for (int i{}; i < nfds; ++i) {
+    int fd = events[i].data.fd;
 
+    if (events[i].events & EPOLLHUP) {
+      std::cout << "Disconnected fd" << fd << std::endl;
+      close(fd);
+    } else if (events[i].events & EPOLLIN) {
+      char buffer[128]{};
+      ssize_t count;
+      while ((count = recv(fd, buffer, sizeof(buffer), 0)) > 0) {
+        std::cout << "Clients input was: " << buffer << std::endl;
+        if ((count = send(fd, buffer, sizeof(buffer), 0)) == -1) {
+          std::cerr << "ERROR: send failed" << std::endl;
+          close(fd);
+          break;
+        }
+      }
+      if (count == 0) {
+        std::cout << "Client disconnected" << std::endl;
+        close(fd);
+      } else if (count == -1 && errno != EAGAIN) {
+        std::cerr << "ERROR: recv failed" << std::endl;
+        close(fd);
+      }
+    }
+  }
 }
 
 
@@ -77,11 +102,11 @@ void Server::Run() const {
   while (true) {
     int nfds = epoll_wait(epoll_fd, events, MAX_EVENTS, WAIT_TIMEOUT);
     if (nfds == 0) {
-      std::cerr << "ERROR: epoll_wait errno --> " << std::strerror(errno) << std::endl;
+      std::cout << "Timeout 20 hit" << std::endl;
       break;
     }
 
-    for (int i = 0; i < nfds; ++i) {
+    for (int i{}; i < nfds; ++i) {
       if (events[i].data.fd == server_fd) {
         while (true) {
           sockaddr_in client_info{};
@@ -90,7 +115,7 @@ void Server::Run() const {
 
           if (client_fd == -1) {
             if (errno == EAGAIN) {
-              std::cerr << "ERROR: accept client failed--> " << std::strerror(errno) << std::endl;
+              //std::cerr << "ERROR: accept client failed--> " << std::strerror(errno) << std::endl;
               break;
             }
           }
@@ -109,52 +134,4 @@ void Server::Run() const {
 
   close(server_fd);
   close(epoll_fd);
-
-
-
-
-
-  int counting_connections = 3;
-  while (counting_connections) {
-    sockaddr_in client_info{};
-    socklen_t client_info_len = sizeof(client_info);
-    std::cout << "Wait for client...\n" << std::endl;
-    int client_socket_fd = accept(server_fd, reinterpret_cast<sockaddr*>(&client_info), &client_info_len);
-    if (client_socket_fd == -1) {
-      std::cerr << "ERROR: accept client failed" << std::endl;
-      continue;
-    }
-
-    char buffer[128]{};
-    std::size_t buffer_size = sizeof(buffer);
-    while (true) {
-      ssize_t bytes_read = recv(client_socket_fd, buffer, buffer_size, 0);
-      if (bytes_read == -1) {
-        std::cerr << "ERROR: recv failed" << std::endl;
-        continue;
-      }
-      if (bytes_read == 0) {
-        break;
-      }
-      std::cout << "Clients input was: " << buffer << std::endl;
-      if (buffer[0] == 'e' && buffer[1] == 'x' && buffer[2] == 'i' && buffer[3] == 't') {
-        strcpy(buffer, "Are you sure you want to exit? [y, N]:");
-        if (send(client_socket_fd, buffer, buffer_size, 0) == -1) {
-          std::cerr << "ERROR: send failed on exiting" << std::endl;
-          continue;
-        }
-        if (recv(client_socket_fd, buffer, buffer_size, 0) == -1) {
-          std::cerr << "ERROR: recv failed on exiting" << std::endl;
-          continue;
-        }
-        if (buffer[0] == 'y') { break; }
-      }
-      if (send(client_socket_fd, buffer, buffer_size, 0) == -1) {
-        std::cerr << "ERROR: echo send failed" << std::endl;
-      }
-    }
-    --counting_connections;
-  }
-
-  close(server_fd);
 }

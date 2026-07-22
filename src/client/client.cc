@@ -50,7 +50,7 @@ void Client::Connect() {
       std::cerr << "ERROR: sending data failed" << std::endl;
       continue;
     }
-
+    buffer[0] = '\0';
     int bytes_received = recv(client_socket_fd, buffer, buffer_size, 0);
 
     if (bytes_received == -1) {
