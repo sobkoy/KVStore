@@ -65,13 +65,15 @@ void HandleEvents(epoll_event* events, int nfds) {
     } else if (events[i].events & EPOLLIN) {
       char buffer[128]{};
       ssize_t count;
-      while ((count = recv(fd, buffer, sizeof(buffer), 0)) > 0) {
+      while ((count = recv(fd, buffer, sizeof(buffer) - 1, 0)) > 0) {
+        buffer[count] = '\0';
         std::cout << "Clients input was: " << buffer << std::endl;
         if ((count = send(fd, buffer, sizeof(buffer), 0)) == -1) {
           std::cerr << "ERROR: send failed" << std::endl;
           close(fd);
           break;
         }
+        std::memset(buffer, '\0', sizeof(buffer));
       }
       if (count == 0) {
         std::cout << "Client disconnected" << std::endl;
@@ -98,6 +100,13 @@ void Server::Run() const {
   epoll_ctl(epoll_fd, EPOLL_CTL_ADD, server_fd, &event);
 
   epoll_event events[MAX_EVENTS];
+
+  //
+  //
+  // PUT REQUEST HANDLE HERE AND THEN PASS IT TO THE HANDLE_EVENT
+  // HANDLER WILL CREATE STORE AND 1 TIME AND THEN IN HANDLE METHOD PARSE IT AND COMMAND EXECUTE
+  //
+  //
 
   while (true) {
     int nfds = epoll_wait(epoll_fd, events, MAX_EVENTS, WAIT_TIMEOUT);
